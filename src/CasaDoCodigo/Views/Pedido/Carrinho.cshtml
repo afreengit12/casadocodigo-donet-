@@ -1,0 +1,133 @@
+﻿@model CarrinhoViewModel;
+
+@{
+    ViewData["Title"] = "Carrinho";
+}
+
+<h3>Meu Carrinho</h3>
+
+<form asp-action="carrinho" method="post"></form>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+
+        <div class="row">
+            <div class="col-md-6">
+                Item
+            </div>
+            <div class="col-md-2 text-center">
+                Preço Unitário
+            </div>
+            <div class="col-md-2 text-center">
+                Quantidade
+            </div>
+            <div class="col-md-2">
+                <span class="pull-right">
+                    Subtotal
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="panel-body">
+        <div no-itens>
+            @{
+                foreach (var item in Model.Itens)
+                {
+                    <div class="row row-center linha-produto" item-id="@item.Id">
+                        <div class="col-md-3">
+                            <img class="img-produto-carrinho" src="/images/produtos/large_@{@item.Produto.Codigo}.jpg" />
+                        </div>
+                        <div class="col-md-3">@item.Produto.Nome</div>
+                        <div class="col-md-2 text-center">R$ @item.Produto.Preco</div>
+                        <div class="col-md-2 text-center">
+                            <div class="input-group">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" onclick="carrinho.clickDecremento(this)">
+                                        <span class="glyphicon-minus"></span>
+                                    </button>
+                                </span>
+                                <input type="text" value="@item.Quantidade"
+                                       class="form-control text-center" onblur="carrinho.updateQuantidade(this)" />
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" onclick="carrinho.clickIncremento(this)">
+                                        <span class="glyphicon-plus"></span>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            R$ <span class="pull-right" subtotal>
+                                @{
+                                    @item.Subtotal;
+                                }
+                            </span>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-10">
+                <span numero-itens>
+                    Total: @Model.Itens.Count
+                    @(Model.Itens.Count > 1 ? @Html.Raw("itens") : @Html.Raw("item"))
+                </span>
+            </div>
+            <div class="col-md-2">
+                Total: R$ <span class="pull-right" total>
+                    @Model.Total
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="pull-right">
+            <a class="btn btn-success"
+               asp-controller="Pedido"
+               asp-action="Carrossel">
+                Adicionar Produtos
+            </a>
+            <a class="btn btn-success"
+               asp-controller="Pedido"
+               asp-action="Cadastro" btnFinalizarPedido>
+                Preencher cadastro
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/js/carrinho.js">
+
+        (function ($) {
+            $.fn.inputFilter = function (inputFilter) {
+                return this.on("input keydown keyup mousedown mouseup select contextmenu drop", function () {
+                    if (inputFilter(this.value)) {
+                        this.oldValue = this.value;
+                        this.oldSelectionStart = this.selectionStart;
+                        this.oldSelectionEnd = this.selectionEnd;
+                    } else if (this.hasOwnProperty("oldValue")) {
+                        this.value = this.oldValue;
+                        this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+                    }
+                });
+            };
+        }(jQuery));
+
+        $(document).ready(function () {
+            // Restrict input to digits by using a regular expression filter.
+            $(".form-control").inputFilter(function (value) {
+                return /^\d*$/.test(value);
+            });
+        });
+
+    </script>
+
+
+}
